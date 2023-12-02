@@ -1,7 +1,8 @@
 from deck import Deck
 from hand_players import Hand_Players
 
-deck = Deck()
+
+
 class Card:
 
     def __init__(self):

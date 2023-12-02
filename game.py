@@ -1,5 +1,4 @@
-isRunning = True
-Menu = True
+import pygame as pg
 
 
 def rules():
@@ -63,45 +62,35 @@ def menu():
     print("3. Выход")
 
 
-def select_players(isRunning):
-    global num_players
-    num_players = input("Введите количество игроков (2-4): ")
-    if num_players.isdigit():
-        num_players = int(num_players)
-        if num_players >= 2 and num_players <= 4:
-            print("Количество игроков выбрано:", num_players)
-        else:
-            print("Неверное количество игроков. Попробуйте еще раз.")
-            select_players(isRunning)
-    else:
-        print("Неверный ввод. Попробуйте еще раз.")
-        select_players(isRunning)
-
-    if num_players == 2:
-        #play.play_game_2p(isRunning)
-    if num_players == 3:
-        #play.play_game_3p()
-    if num_players == 4:
-        #play.play_game_4p()
-
-
-def main_menu():
-    global Menu
-    while Menu:
-        menu()
-
-        choice = input("Выберите пункт меню: ")
-
-        if choice == "1":
-            #game()
-        elif choice == "2":
-            rules()
-        elif choice == "3":
-            print("Выход из игры")
-            break
-        else:
-            print("Неправильный выбор, попробуйте еще раз.")
-
-
-main_menu()
-
+card_images = {
+    (1, 'orange'): pg.image.load("GUI/card_img/1_orange.png"),
+    (2, 'orange'): pg.image.load("GUI/card_img/2_orange.png"),
+    (3, 'orange'): pg.image.load("GUI/card_img/3_orange.png"),
+    (4, 'orange'): pg.image.load("GUI/card_img/4_orange.png"),
+    (5, 'orange'): pg.image.load("GUI/card_img/5_orange.png"),
+    (6, 'orange'): pg.image.load("GUI/card_img/6_orange.png"),
+    (7, 'orange'): pg.image.load("GUI/card_img/7_orange.png"),
+    (8, 'orange'): pg.image.load("GUI/card_img/8_orange.png"),
+    (9, 'orange'): pg.image.load("GUI/card_img/9_orange.png"),
+    (10, 'orange'): pg.image.load("GUI/card_img/10_orange.png"),
+    (1, 'blue'): pg.image.load("GUI/card_img/1_blue.png"),
+    (2, 'blue'): pg.image.load("GUI/card_img/2_blue.png"),
+    (3, 'blue'): pg.image.load("GUI/card_img/3_blue.png"),
+    (4, 'blue'): pg.image.load("GUI/card_img/4_blue.png"),
+    (5, 'blue'): pg.image.load("GUI/card_img/5_blue.png"),
+    (6, 'blue'): pg.image.load("GUI/card_img/6_blue.png"),
+    (7, 'blue'): pg.image.load("GUI/card_img/7_blue.png"),
+    (8, 'blue'): pg.image.load("GUI/card_img/8_blue.png"),
+    (9, 'blue'): pg.image.load("GUI/card_img/9_blue.png"),
+    (10, 'blue'): pg.image.load("GUI/card_img/10_blue.png"),
+    (1, 'green'): pg.image.load("GUI/card_img/1_green.png"),
+    (2, 'green'): pg.image.load("GUI/card_img/2_green.png"),
+    (3, 'green'): pg.image.load("GUI/card_img/3_green.png"),
+    (4, 'green'): pg.image.load("GUI/card_img/4_green.png"),
+    (5, 'green'): pg.image.load("GUI/card_img/5_green.png"),
+    (6, 'green'): pg.image.load("GUI/card_img/6_green.png"),
+    (7, 'green'): pg.image.load("GUI/card_img/7_green.png"),
+    (8, 'green'): pg.image.load("GUI/card_img/8_green.png"),
+    (9, 'green'): pg.image.load("GUI/card_img/9_green.png"),
+    (10, 'green'): pg.image.load("GUI/card_img/10_green.png"),
+}
