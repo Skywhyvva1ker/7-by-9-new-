@@ -6,16 +6,15 @@ RSC = {
     ''
     'img': {
         'bg_color': (84, 179, 179),
-        'back': 'resources/img/back.png',
-        'card': 'resources/img/{}.png'
+        'back': 'GUI/cad_img/card_background.png',
+        'card': 'GUI/cad_img/{}.png',
+        'BLACK': (0, 0, 0),
+        'WHITE': (255, 255, 255)
     },
-    'sound': {
-    },
-    'font': {
-    }
+    'main_sound': "GUI/sounds/Free-Flow-Flava-This-Is-Japan.wav",
 }
 
-#info = pg.display.Info()
+# info = pg.display.Info()
 # width = info.current_w
 # height = info.current_h - 65
 

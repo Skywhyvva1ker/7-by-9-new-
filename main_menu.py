@@ -5,15 +5,18 @@ from hand_players import Hand_Players
 from GUI.config import GEOM
 from GUI.config import RSC
 from game import *
+import random
+import time
 
 pg.init()
 width, height = GEOM['display']
 screen = pg.display.set_mode((width, height))
 pg.display.set_caption("7 НА 9")
 
+card_width, card_height = GEOM['card']
 icon_img = pg.image.load('GUI/other_img/icon.png')
 
-pg.mixer.music.load("GUI/sounds/Free-Flow-Flava-This-Is-Japan.wav")
+pg.mixer.music.load(RSC['main_sound'])
 pg.mixer.music.set_volume(0.05)
 pg.mixer.music.play(-1)
 
@@ -21,42 +24,100 @@ display = pg.display.set_mode((width, height))
 pg.display.set_icon(icon_img)
 
 bg_color = RSC['img']['bg_color']
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+BLACK = RSC['img']['BLACK']
+WHITE = RSC['img']['WHITE']
 
 # Создание кнопок
 button_font = pg.font.SysFont("Arial", 30)
 
+# КНОПКА ИГРАТЬ
 button_play = pg.Surface((200, 70))
 button_play.fill(BLACK)
 button_play_rect = button_play.get_rect(center=(width // 2, height // 2 - 150))
 button_play_text = button_font.render("Играть", True, WHITE, BLACK)
 button_play_text_rect = button_play_text.get_rect(center=button_play_rect.center)
 
+# КНОПКА ПРАВИЛА
 button_rules = pg.Surface((200, 70))
 button_rules.fill(BLACK)
-button_rules_rect = button_rules.get_rect(center=(width // 2 , height // 2 - 50))
+button_rules_rect = button_rules.get_rect(center=(width // 2, height // 2 - 50))
 button_rules_text = button_font.render("Правила", True, WHITE, BLACK)
 button_rules_text_rect = button_rules_text.get_rect(center=button_rules_rect.center)
 
+# КНОПКА НАСТРОЙКИ
 button_settings = pg.Surface((200, 70))
 button_settings.fill(BLACK)
 button_settings_rect = button_settings.get_rect(center=(width // 2, height // 2 + 50))
 button_settings_text = button_font.render("Настройки", True, WHITE, BLACK)
 button_settings_text_rect = button_settings_text.get_rect(center=button_settings_rect.center)
 
+# КНОПКА ВЫХОД
 button_exit = pg.Surface((200, 70))
 button_exit.fill(BLACK)
 button_exit_rect = button_exit.get_rect(center=(width // 2, height // 2 + 200))
 button_exit_text = button_font.render("Выход", True, WHITE, BLACK)
 button_exit_text_rect = button_exit_text.get_rect(center=button_exit_rect.center)
 
+# КНОПКА ВКЛ/ВЫКЛ МУЗЫКИ
+pause_button = pg.image.load("GUI/other_img/music_on.png")
+pause_button_width = pause_button.get_width()
+pause_button_height = pause_button.get_height()
+pause_button_rect = pause_button.get_rect(bottomright=(screen.get_width() - 10, screen.get_height() - 10))
+
+pause = False
+current_player = None
+
+
+def paused_music():
+    global pause_button
+    if pause:
+        pause_button = pg.image.load("GUI/other_img/music_off.png")
+        pg.mixer.music.pause()
+    else:
+        pause_button = pg.image.load("GUI/other_img/music_on.png")
+        pg.mixer.music.play()
+
+
+def choose_random_player():
+    current_player = random.randint(1, Deck.num_players)
+    print('Ходит игрок:', current_player)
+
+# Определение шрифта и размера текста
+font = pg.font.SysFont('Times New Roman', 22)
+small_font = pg.font.SysFont('Times New Roman', 16)
+
+# Определение текста
+text1 = font.render('ПРАВИЛА НАСТОЛЬНОЙ ИГРЫ 7 НА 9', True, BLACK)
+text2 = small_font.render('ОБ ИГРЕ', True, BLACK)
+text3 = small_font.render('2-4 игрока. Тут все просто: есть карты, на них цифры.', True, BLACK)
+text4 = small_font.render(
+    'Нужно быстро считать и класть подходящую карту в центр стола.',
+    True, BLACK)
+text5 = small_font.render(
+    'Очередности хода нет. Кто первым посчитал, кладёт карту.',
+    True, BLACK)
+
+# Определение позиции текста
+text1_rect = text1.get_rect(center=(width // 2, int(height * 0.04)))
+text2_rect = text2.get_rect(topleft=(int(width * 0.06), int(height * 0.07)))
+text3_rect = text3.get_rect(topleft=(int(width * 0.03), int(height * 0.1)))
+text4_rect = text4.get_rect(topleft=(int(width * 0.03), int(height * 0.13)))
+text5_rect = text4.get_rect(topleft=(int(width * 0.03), int(height * 0.16)))
+
+def rules_text_view():
+    screen.blit(text1, text1_rect)
+    screen.blit(text2, text2_rect)
+    screen.blit(text3, text3_rect)
+    screen.blit(text4, text4_rect)
+    screen.blit(text5, text5_rect)
+
+
+last_choice_time = time.time()
+
 gameState = "главное меню"
-
-card_width, card_height = GEOM['card']
-
 running = True
 while running:
+    current_time = time.time()
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
@@ -66,20 +127,48 @@ while running:
                     Deck.num_players = 2
                     print("Кнопка 'Играть' нажата!")
                     gameState = "игра началась"
-                    Deck = Deck()
-                    print(Deck.DECK)
-                    print(Deck.table_card)
+                    deck = Deck()
+                    deck.num_players = 2
+                    deck.deal_cards()
+                    print(deck.DECK)
+                    print(deck.table_card)
+                    print(deck.player1_deck)
+                    print(deck.player2_deck)
+                    choose_random_player()
                 elif button_rules_rect.collidepoint(event.pos):
+                    gameState = "открыты правила"
                     print("Кнопка 'Правила' нажата!")
                 elif button_settings_rect.collidepoint(event.pos):
+                    gameState = "открыты настройки"
                     print("Кнопка 'Настройки' нажата!")
+                elif pause_button_rect.collidepoint(event.pos):
+                    pause = not pause
+                    paused_music()
                 elif button_exit_rect.collidepoint(event.pos):
                     running = False
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if gameState == "игра началась":
+                if pause_button_rect.collidepoint(event.pos):
+                    pause = not pause
+                    paused_music()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if gameState == "открыты правила":
+                if pause_button_rect.collidepoint(event.pos):
+                    pause = not pause
+                    paused_music()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if gameState == "открыты настройки":
+                if pause_button_rect.collidepoint(event.pos):
+                    pause = not pause
+                    paused_music()
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                print("Кнопка 'Escape' нажата ")
+                gameState = "главное меню"
 
     screen.fill(bg_color)
 
     if gameState == "главное меню":
-        # Отображение кнопок
         screen.blit(button_play, button_play_rect)
         screen.blit(button_play_text, button_play_text_rect)
 
@@ -91,8 +180,24 @@ while running:
 
         screen.blit(button_exit, button_exit_rect)
         screen.blit(button_exit_text, button_exit_text_rect)
+
+        screen.blit(pause_button, pause_button_rect)
+
     elif gameState == "игра началась":
-        print('')
+        screen.blit(pause_button, pause_button_rect)
+        if current_time - last_choice_time >= 5 and gameState == "игра началась":
+            # Выбираем случайное число
+            choose_random_player()
+            # Обновляем время последнего выбора
+            last_choice_time = current_time
+
+    elif gameState == "открыты правила":
+        screen.blit(pause_button, pause_button_rect)
+        rules_text_view()
+
+
+    elif gameState == "открыты настройки":
+        screen.blit(pause_button, pause_button_rect)
 
     pg.display.flip()
 
