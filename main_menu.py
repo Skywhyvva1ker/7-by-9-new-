@@ -1,12 +1,12 @@
 import pygame as pg
+import random
+import time
 from card import Card
 from deck import Deck
 from hand_players import Hand_Players
 from GUI.config import GEOM
 from GUI.config import RSC
 from game import *
-import random
-import time
 
 pg.init()
 width, height = GEOM['display']
@@ -64,6 +64,12 @@ pause_button_width = pause_button.get_width()
 pause_button_height = pause_button.get_height()
 pause_button_rect = pause_button.get_rect(bottomright=(screen.get_width() - 10, screen.get_height() - 10))
 
+# КНОПКА BACK
+back_button = pg.image.load("GUI/other_img/back.png")
+back_button_width = back_button.get_width()
+back_button_height = back_button.get_height()
+back_button_rect = back_button.get_rect(bottomright=(screen.get_width() - 50, screen.get_height() - 10))
+
 pause = False
 current_player = None
 
@@ -81,6 +87,7 @@ def paused_music():
 def choose_random_player():
     current_player = random.randint(1, Deck.num_players)
     print('Ходит игрок:', current_player)
+
 
 # Определение шрифта и размера текста
 font = pg.font.SysFont('Times New Roman', 22)
@@ -104,6 +111,7 @@ text3_rect = text3.get_rect(topleft=(int(width * 0.03), int(height * 0.1)))
 text4_rect = text4.get_rect(topleft=(int(width * 0.03), int(height * 0.13)))
 text5_rect = text4.get_rect(topleft=(int(width * 0.03), int(height * 0.16)))
 
+
 def rules_text_view():
     screen.blit(text1, text1_rect)
     screen.blit(text2, text2_rect)
@@ -117,16 +125,17 @@ last_choice_time = time.time()
 gameState = "главное меню"
 running = True
 while running:
-    current_time = time.time()
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+            print('Выход из игры')
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "главное меню":
                 if button_play_rect.collidepoint(event.pos):
                     Deck.num_players = 2
                     print("Кнопка 'Играть' нажата!")
                     gameState = "игра началась"
+                    last_choice_time = 0
                     deck = Deck()
                     deck.num_players = 2
                     deck.deal_cards()
@@ -134,7 +143,6 @@ while running:
                     print(deck.table_card)
                     print(deck.player1_deck)
                     print(deck.player2_deck)
-                    choose_random_player()
                 elif button_rules_rect.collidepoint(event.pos):
                     gameState = "открыты правила"
                     print("Кнопка 'Правила' нажата!")
@@ -151,20 +159,31 @@ while running:
                 if pause_button_rect.collidepoint(event.pos):
                     pause = not pause
                     paused_music()
+                elif back_button_rect.collidepoint(event.pos):
+                    gameState = 'главное меню'
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "открыты правила":
                 if pause_button_rect.collidepoint(event.pos):
                     pause = not pause
                     paused_music()
+                elif back_button_rect.collidepoint(event.pos):
+                    gameState = 'главное меню'
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "открыты настройки":
                 if pause_button_rect.collidepoint(event.pos):
                     pause = not pause
                     paused_music()
+                elif back_button_rect.collidepoint(event.pos):
+                    gameState = 'главное меню'
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 print("Кнопка 'Escape' нажата ")
                 gameState = "главное меню"
+            if event.key == pg.K_q:
+                running = False
+                print('Выход из игры')
+            # if event.key == pg.K_r:
+            #     if gameState == "игра началась":
 
     screen.fill(bg_color)
 
@@ -185,6 +204,8 @@ while running:
 
     elif gameState == "игра началась":
         screen.blit(pause_button, pause_button_rect)
+        screen.blit(back_button, back_button_rect)
+        current_time = time.time()
         if current_time - last_choice_time >= 5 and gameState == "игра началась":
             # Выбираем случайное число
             choose_random_player()
@@ -193,11 +214,13 @@ while running:
 
     elif gameState == "открыты правила":
         screen.blit(pause_button, pause_button_rect)
+        screen.blit(back_button, back_button_rect)
         rules_text_view()
 
 
     elif gameState == "открыты настройки":
         screen.blit(pause_button, pause_button_rect)
+        screen.blit(back_button, back_button_rect)
 
     pg.display.flip()
 
