@@ -8,6 +8,7 @@ from GUI.config import GEOM
 from GUI.config import RSC
 from game import *
 
+
 pg.init()
 width, height = GEOM['display']
 screen = pg.display.set_mode((width, height))
@@ -59,10 +60,10 @@ button_exit_text = button_font.render("Выход", True, WHITE, BLACK)
 button_exit_text_rect = button_exit_text.get_rect(center=button_exit_rect.center)
 
 # КНОПКА ВКЛ/ВЫКЛ МУЗЫКИ
-pause_button = pg.image.load("GUI/other_img/music_on.png")
-pause_button_width = pause_button.get_width()
-pause_button_height = pause_button.get_height()
-pause_button_rect = pause_button.get_rect(bottomright=(screen.get_width() - 10, screen.get_height() - 10))
+pause_music_button = pg.image.load("GUI/other_img/music_on.png")
+pause_music_button_width = pause_music_button.get_width()
+pause_music_button_height = pause_music_button.get_height()
+pause_music_button_rect = pause_music_button.get_rect(bottomright=(screen.get_width() - 10, screen.get_height() - 10))
 
 # КНОПКА BACK
 back_button = pg.image.load("GUI/other_img/back.png")
@@ -70,17 +71,24 @@ back_button_width = back_button.get_width()
 back_button_height = back_button.get_height()
 back_button_rect = back_button.get_rect(bottomright=(screen.get_width() - 50, screen.get_height() - 10))
 
-pause = False
+# КНОПКА ПАУЗЫ/ВОЗОБНОВЛЕНИЯ ИГРЫ
+pause_button = pg.image.load("GUI/other_img/pause.png")
+pause_button_width = pause_button.get_width()
+pause_button_height = pause_button.get_height()
+pause_button_rect = pause_button.get_rect(bottomright=(screen.get_width() - 10, screen.get_height() - 560))
+
+pause_game = False
+pause_music = False
 current_player = None
 
 
 def paused_music():
-    global pause_button
-    if pause:
-        pause_button = pg.image.load("GUI/other_img/music_off.png")
+    global pause_music_button
+    if pause_music:
+        pause_music_button = pg.image.load("GUI/other_img/music_off.png")
         pg.mixer.music.pause()
     else:
-        pause_button = pg.image.load("GUI/other_img/music_on.png")
+        pause_music_button = pg.image.load("GUI/other_img/music_on.png")
         pg.mixer.music.play()
 
 
@@ -122,6 +130,7 @@ def rules_text_view():
 
 last_choice_time = time.time()
 
+
 gameState = "главное меню"
 running = True
 while running:
@@ -129,6 +138,7 @@ while running:
         if event.type == pg.QUIT:
             running = False
             print('Выход из игры')
+
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "главное меню":
                 if button_play_rect.collidepoint(event.pos):
@@ -149,41 +159,53 @@ while running:
                 elif button_settings_rect.collidepoint(event.pos):
                     gameState = "открыты настройки"
                     print("Кнопка 'Настройки' нажата!")
-                elif pause_button_rect.collidepoint(event.pos):
-                    pause = not pause
+                elif pause_music_button_rect.collidepoint(event.pos):
+                    pause_music = not pause_music
                     paused_music()
+                elif pause_button_rect.collidepoint(event.pos):
+                    print('пауза')
                 elif button_exit_rect.collidepoint(event.pos):
                     running = False
+
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "игра началась":
-                if pause_button_rect.collidepoint(event.pos):
-                    pause = not pause
+                if pause_music_button_rect.collidepoint(event.pos):
+                    pause_music = not pause_music
                     paused_music()
+
                 elif back_button_rect.collidepoint(event.pos):
                     gameState = 'главное меню'
+
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "открыты правила":
-                if pause_button_rect.collidepoint(event.pos):
-                    pause = not pause
+                if pause_music_button_rect.collidepoint(event.pos):
+                    pause_music = not pause_music
                     paused_music()
+
                 elif back_button_rect.collidepoint(event.pos):
                     gameState = 'главное меню'
+
         if event.type == pg.MOUSEBUTTONDOWN:
             if gameState == "открыты настройки":
-                if pause_button_rect.collidepoint(event.pos):
-                    pause = not pause
+                if pause_music_button_rect.collidepoint(event.pos):
+                    pause_music = not pause_music
                     paused_music()
+
                 elif back_button_rect.collidepoint(event.pos):
                     gameState = 'главное меню'
+
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 print("Кнопка 'Escape' нажата ")
                 gameState = "главное меню"
-            if event.key == pg.K_q:
+
+            elif event.key == pg.K_q:
                 running = False
                 print('Выход из игры')
-            # if event.key == pg.K_r:
+
+            # elif event.key == pg.K_r:
             #     if gameState == "игра началась":
+            #         pause_game = not pause_game
 
     screen.fill(bg_color)
 
@@ -200,10 +222,11 @@ while running:
         screen.blit(button_exit, button_exit_rect)
         screen.blit(button_exit_text, button_exit_text_rect)
 
-        screen.blit(pause_button, pause_button_rect)
+        screen.blit(pause_music_button, pause_music_button_rect)
 
     elif gameState == "игра началась":
         screen.blit(pause_button, pause_button_rect)
+        screen.blit(pause_music_button, pause_music_button_rect)
         screen.blit(back_button, back_button_rect)
         current_time = time.time()
         if current_time - last_choice_time >= 5 and gameState == "игра началась":
@@ -213,13 +236,12 @@ while running:
             last_choice_time = current_time
 
     elif gameState == "открыты правила":
-        screen.blit(pause_button, pause_button_rect)
+        screen.blit(pause_music_button, pause_music_button_rect)
         screen.blit(back_button, back_button_rect)
         rules_text_view()
 
-
     elif gameState == "открыты настройки":
-        screen.blit(pause_button, pause_button_rect)
+        screen.blit(pause_music_button, pause_music_button_rect)
         screen.blit(back_button, back_button_rect)
 
     pg.display.flip()
